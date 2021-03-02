@@ -1,0 +1,28 @@
+version: '3'
+services:
+  node:
+    build:
+      context: ./docker/node
+    tty: true
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./src/firstclimb-react:/usr/src/firstclimb-react
+    command: sh -c "cd ./firstclimb-react | yarn run dev"
+    ports:
+      - "3000:3000"
+
+  go: # service名
+    build:
+      context: ./docker/go # ビルドに使用するDockerfileがあるディレクトリ指定
+    tty: true # コンテナの起動永続化
+    volumes:
+      - ./src/firstclimb-go:/go/src/app # マウントディレクトリ指定
+    ports:
+      - "5000:5000"
+    links:
+      - redis
+    command: go run main.go
+
+  redis:
+    image: redis
